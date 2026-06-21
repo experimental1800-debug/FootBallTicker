@@ -1,0 +1,251 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-family: "RoobertVF", "RoobertVF Fallback", "Helvetica Neue", Arial, Helvetica, sans-serif;
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-semi-bold: 650;
+    --font-weight-bold: 750;
+    --font-weight-heavy: 900;
+    --font-feature-settings: "ss01" 1;
+    --fanatic-font-weight-l-header: var(--font-weight-semi-bold);
+    --fanatic-font-weight-s-header: var(--font-weight-semi-bold);
+    --fanatic-font-weight-xs-header: var(--font-weight-semi-bold);
+    --fanatic-font-weight-mod-bold: var(--font-weight-bold);
+    --fanatic-font-weight-mod-semibold: var(--font-weight-semi-bold);
+    --fred-focus-color: #000000;
+    --fred-focus-inverted-color: #ffffff;
+    --fred-focus-padding: 0.25rem;
+    --fred-focus-box-shadow-padding: -0.25rem;
+    --fred-focus-background-color: #f5f5f4;
+    --fred-focus-inverted-background-color: #ffffff;
+    --fred-focus-box-shadow: 0 0 0 var(--fred-focus-box-shadow-padding) var(--fred-focus-background-color);
+    --fred-focus-inverted-box-shadow: 0 0 0 var(--fred-focus-box-shadow-padding) var(--fred-focus-inverted-background-color);
+    --fred-focus-outline-width: 0.125rem;
+    --fred-focus-keyboard-outline-offset: calc(var(--fred-focus-outline-width) * -1);
+    --theme-text-color-primary: #181818;
+    --theme-text-color-primary-alt: #ffffff;
+    --theme-text-color-secondary: #525252;
+    --theme-text-color-tertiary: #767575;
+    --theme-text-color-critical: #ba2626;
+    --theme-text-color-money: #0b6f46;
+    --theme-text-color-success: #0b6f46;
+    --theme-text-color-warning: #b84d00;
+    --theme-text-color-special: #db1600;
+    --theme-text-color-special-alt: #ff5b49;
+    --theme-text-color-disabled: #76757599;
+    --theme-background-color-primary: #ffffff;
+    --theme-background-color-primary-alt: #181818;
+    --theme-background-color-secondary: #f5f5f4;
+    --theme-background-color-tertiary: #f8f7f5;
+    --theme-background-color-critical: #fdf0f0;
+    --theme-background-color-warning: #fef3ec;
+    --theme-background-color-success: #ecf8f3;
+    --theme-background-color-destructive: #ba2626;
+    --theme-background-color-tooltip: #000000;
+    --theme-background-color-overlay: #000c;
+    --theme-background-color-disabled: #f5f5f4;
+    --theme-background-color-control-base: #ffffff;
+    --theme-background-color-control-hover: #f5f5f4;
+    --theme-background-color-control-pressed: #ffffff;
+    --theme-background-color-control-selected-base: #181818;
+    --theme-background-color-control-selected-hover: #767575;
+    --theme-background-color-control-selected-pressed: #acacac;
+    --theme-background-color-button-primary-base: #000000;
+    --theme-background-color-button-primary-hover: #000000cf;
+    --theme-background-color-button-primary-pressed: #000000;
+    --theme-background-color-button-secondary-base: #ffffff;
+    --theme-background-color-button-secondary-hover: #ffffff;
+    --theme-background-color-button-secondary-pressed: #ffffff;
+    --theme-background-color-button-tertiary-base: transparent;
+    --theme-background-color-button-tertiary-hover: transparent;
+    --theme-background-color-button-tertiary-pressed: transparent;
+    --theme-background-color-button-success-base: #055d48;
+    --theme-background-color-button-success-hover: #024031;
+    --theme-background-color-button-success-pressed: #024031;
+    --theme-background-color-button-critical-base: #b61d2f;
+    --theme-background-color-button-critical-hover: #9d0c1d;
+    --theme-background-color-button-critical-pressed: #9d0c1d;
+    --theme-background-color-button-dark-transparent-base: #ffffff1f;
+    --theme-background-color-button-dark-transparent-hover: #ffffff29;
+    --theme-background-color-button-dark-transparent-pressed: #ffffff1f;
+    --theme-divider-color: #00000014;
+    --theme-icon-color-primary-base: #181818;
+    --theme-icon-color-primary-hover: #525252;
+    --theme-icon-color-primary-pressed: #767575;
+    --theme-icon-color-primary-alt-base: #ffffff;
+    --theme-icon-color-primary-alt-hover: #ffffff;
+    --theme-icon-color-secondary: #767575;
+    --theme-icon-color-secondary-hover: #9c9c9c;
+    --theme-icon-color-secondary-pressed: #9c9c9cd6;
+    --theme-icon-color-tertiary: #dedddb;
+    --theme-icon-color-critical: #dd3c3c;
+    --theme-icon-color-success: #0b6f46;
+    --theme-icon-color-warning: #f26907;
+    --theme-icon-color-special-base: #ff5b49;
+    --theme-icon-color-special-hover: #ff5b49a3;
+    --theme-icon-color-disabled: #76757599;
+    --theme-icon-color-tracking-base: #dd3c3c;
+    --theme-icon-color-tracking-hover: #ec9292;
+    --theme-icon-color-tracking-pressed: #ba2626;
+    --theme-border-color-primary: #dedddb;
+    --theme-border-color-primary-alt: #ffffff;
+    --theme-border-color-primarySelected: #000000;
+    --theme-border-color-primaryHover: gray;
+    --theme-border-color-primaryPressed: #bfbfbf;
+    --theme-border-color-secondary: #dedddb;
+    --theme-border-color-critical: #ba2626;
+    --theme-border-color-accessible: #00000052;
+    --theme-border-color-disabled: #dedddb;
+    --theme-border-color-fred: #000000;
+    --theme-border-color-keyboard-focus: #000000;
+    --theme-overlay-color-primary: #000c;
+    --theme-overlay-color-blur-primary: #0000007a;
+    --theme-overlay-color-blur-secondary: #000000a3;
+    --theme-opacity-color-black-100: #000000;
+    --theme-opacity-color-black-80: #000c;
+    --theme-opacity-color-black-64: #000000a3;
+    --theme-opacity-color-black-48: #0000007a;
+    --theme-opacity-color-black-32: #00000052;
+    --theme-opacity-color-black-24: #0000003d;
+    --theme-opacity-color-black-16: #00000029;
+    --theme-opacity-color-black-12: #0000001f;
+    --theme-opacity-color-black-8: #00000014;
+    --theme-opacity-color-black-0: #0000;
+    --theme-opacity-color-white-100: #ffffff;
+    --theme-opacity-color-white-80: #fffc;
+    --theme-opacity-color-white-64: #ffffffa3;
+    --theme-opacity-color-white-48: #ffffff7a;
+    --theme-opacity-color-white-32: #ffffff52;
+    --theme-opacity-color-white-24: #ffffff3d;
+    --theme-opacity-color-white-16: #ffffff29;
+    --theme-opacity-color-white-12: #ffffff1f;
+    --theme-opacity-color-white-8: #ffffff14;
+    --theme-opacity-color-white-0: #fff0;
+    --theme-brand-color-dark2: #6d0b00;
+    --theme-brand-color-dark: #ff5b49;
+    --theme-brand-color-base: #ff5b49;
+    --theme-brand-color-light56: #ffa399;
+    --theme-brand-color-light24: #ffd8d3;
+    --theme-brand-color-light08: #fff2f0;
+    --theme-brand-color-secondary-base: #181818;
+    --theme-brand-color-secondary-dark: #000000;
+    --gutter-spacing: 1.25rem;
+  }
+
+  html,
+  body,
+  div,
+  span,
+  applet,
+  object,
+  iframe,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  blockquote,
+  pre,
+  a,
+  abbr,
+  acronym,
+  address,
+  big,
+  cite,
+  code,
+  del,
+  dfn,
+  em,
+  img,
+  ins,
+  kbd,
+  q,
+  s,
+  samp,
+  small,
+  strike,
+  strong,
+  sub,
+  sup,
+  tt,
+  var,
+  b,
+  u,
+  i,
+  center,
+  dl,
+  dt,
+  dd,
+  ol,
+  ul,
+  li,
+  fieldset,
+  form,
+  label,
+  legend,
+  table,
+  caption,
+  tbody,
+  tfoot,
+  thead,
+  tr,
+  th,
+  td,
+  article,
+  aside,
+  canvas,
+  details,
+  embed,
+  figure,
+  figcaption,
+  footer,
+  header,
+  hgroup,
+  menu,
+  nav,
+  output,
+  ruby,
+  section,
+  summary,
+  time,
+  mark,
+  audio,
+  video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    vertical-align: baseline;
+  }
+
+  html {
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-family);
+    font-size: 1rem;
+    font-feature-settings: var(--font-feature-settings, "salt");
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--theme-background-color-primary);
+    color: var(--theme-text-color-primary);
+  }
+}
+
+@layer components {
+  .world-cup-event-list {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+}
