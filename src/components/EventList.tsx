@@ -5,11 +5,12 @@ import { CalendarX } from "lucide-react";
 
 interface EventListProps {
   events: Event[];
+  onPurchase?: (event: Event) => void;
 }
 
 const INITIAL_VISIBLE_EVENTS = 25;
 
-export default function EventList({ events }: EventListProps) {
+export default function EventList({ events, onPurchase }: EventListProps) {
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_EVENTS);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function EventList({ events }: EventListProps) {
   return (
     <div className="space-y-3 md:space-y-2">
       {visibleEvents.map((event) => (
-        <EventCard key={event.id} event={event} />
+        <EventCard key={event.id} event={event} onPurchase={onPurchase} />
       ))}
       {hasMoreEvents && (
         <button

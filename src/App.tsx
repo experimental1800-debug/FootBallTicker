@@ -10,6 +10,7 @@ import StageHero from "./components/StageHero";
 import CityHero from "./components/CityHero";
 import TeamHero from "./components/TeamHero";
 import VenueInfoCard from "./components/VenueInfoCard";
+import CryptoPaymentDrawer from "./components/CryptoPaymentDrawer";
 import Footer from "./components/Footer";
 import { buildFilterOptions, fallbackEvents, type Event } from "./data/events";
 import { eventMatchesHostCity, getHostCityByPath } from "./data/hostCities";
@@ -25,11 +26,20 @@ export default function App() {
   const [selectedTeam, setSelectedTeam] = useState("Team");
   const [isLoading, setIsLoading] = useState(true);
   const [dataMessage, setDataMessage] = useState<string | null>(null);
+  const [selectedCheckoutEvent, setSelectedCheckoutEvent] = useState<Event | null>(null);
 
   const navigateTo = useCallback((nextPath: string) => {
     window.history.pushState({}, "", nextPath);
     setPathname(nextPath);
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
+
+  const openCheckoutDrawer = useCallback((event: Event) => {
+    setSelectedCheckoutEvent(event);
+  }, []);
+
+  const closeCheckoutDrawer = useCallback(() => {
+    setSelectedCheckoutEvent(null);
   }, []);
 
   useEffect(() => {
@@ -96,6 +106,10 @@ export default function App() {
       targetElement.scrollIntoView({ behavior: "auto", block: "start" });
     });
   }, [pathname, isLoading]);
+
+  useEffect(() => {
+    setSelectedCheckoutEvent(null);
+  }, [pathname]);
 
   const filterOptions = useMemo(() => buildFilterOptions(allEvents), [allEvents]);
   const currentStage = useMemo(() => getWorldCupStageByPath(pathname), [pathname]);
@@ -209,7 +223,7 @@ export default function App() {
                     Loading the latest fixtures...
                   </div>
                 ) : (
-                  <EventList events={teamEvents} />
+                  <EventList events={teamEvents} onPurchase={openCheckoutDrawer} />
                 )}
               </div>
             </section>
@@ -235,6 +249,11 @@ export default function App() {
         </div>
 
         <Footer />
+        <CryptoPaymentDrawer
+          event={selectedCheckoutEvent}
+          isOpen={Boolean(selectedCheckoutEvent)}
+          onClose={closeCheckoutDrawer}
+        />
       </div>
     );
   }
@@ -262,7 +281,7 @@ export default function App() {
                     Loading the latest fixtures...
                   </div>
                 ) : (
-                  <EventList events={cityEvents} />
+                  <EventList events={cityEvents} onPurchase={openCheckoutDrawer} />
                 )}
               </div>
             </section>
@@ -289,6 +308,11 @@ export default function App() {
         </div>
 
         <Footer />
+        <CryptoPaymentDrawer
+          event={selectedCheckoutEvent}
+          isOpen={Boolean(selectedCheckoutEvent)}
+          onClose={closeCheckoutDrawer}
+        />
       </div>
     );
   }
@@ -316,7 +340,7 @@ export default function App() {
                     Loading the latest fixtures...
                   </div>
                 ) : (
-                  <EventList events={stageEvents} />
+                  <EventList events={stageEvents} onPurchase={openCheckoutDrawer} />
                 )}
               </div>
             </section>
@@ -342,6 +366,11 @@ export default function App() {
         </div>
 
         <Footer />
+        <CryptoPaymentDrawer
+          event={selectedCheckoutEvent}
+          isOpen={Boolean(selectedCheckoutEvent)}
+          onClose={closeCheckoutDrawer}
+        />
       </div>
     );
   }
@@ -387,7 +416,7 @@ export default function App() {
                 Loading the latest fixtures...
               </div>
             ) : (
-              <EventList events={filtered} />
+              <EventList events={filtered} onPurchase={openCheckoutDrawer} />
             )}
           </section>
 
@@ -403,6 +432,11 @@ export default function App() {
         {!isLoading ? <WorldCupScheduleInfo onNavigate={navigateTo} /> : null}
       </div>
       <Footer />
+      <CryptoPaymentDrawer
+        event={selectedCheckoutEvent}
+        isOpen={Boolean(selectedCheckoutEvent)}
+        onClose={closeCheckoutDrawer}
+      />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
 
 interface EventCardProps {
   event: Event;
+  onPurchase?: (event: Event) => void;
 }
 
 function TeamBadge({
@@ -65,7 +66,7 @@ function TeamBadge({
   );
 }
 
-export default function EventCard({ event }: EventCardProps) {
+export default function EventCard({ event, onPurchase }: EventCardProps) {
   const teams = [event.homeTeam?.trim() || "TBD", event.awayTeam?.trim() || "TBD"];
   const matchup =
     event.homeTeam === "TBD" && event.awayTeam === "TBD"
@@ -85,8 +86,7 @@ export default function EventCard({ event }: EventCardProps) {
     : event.round;
 
   return (
-    <a
-      href="#"
+    <article
       className="grid grid-cols-[44px_minmax(0,1fr)] gap-x-4 gap-y-2 rounded-[1.3rem] px-2 py-3 transition-colors hover:bg-[var(--theme-background-color-primary)]/60 md:grid-cols-[56px_118px_minmax(0,1fr)_152px] md:grid-rows-[auto_auto] md:items-center md:gap-x-6 md:gap-y-1 md:px-0 md:py-4"
     >
       <p className="col-span-full text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[var(--theme-text-color-tertiary)] md:col-start-3 md:col-span-1 md:row-start-1">
@@ -127,10 +127,14 @@ export default function EventCard({ event }: EventCardProps) {
       </div>
 
       <div className="col-span-full flex justify-start md:col-start-4 md:row-start-1 md:row-span-2 md:justify-end">
-        <div className="inline-flex min-w-[135px] items-center justify-center rounded-[0.85rem] bg-[var(--theme-background-color-button-primary-base)] px-5 py-3.5 text-center text-[1rem] font-bold text-[var(--theme-text-color-primary-alt)] shadow-[0_1px_0_rgba(255,255,255,0.06)_inset] md:min-w-[135px] md:px-4 md:py-3">
+        <button
+          type="button"
+          onClick={() => onPurchase?.(event)}
+          className="inline-flex min-w-[135px] items-center justify-center rounded-[0.85rem] bg-[var(--theme-background-color-button-primary-base)] px-5 py-3.5 text-center text-[1rem] font-bold text-[var(--theme-text-color-primary-alt)] shadow-[0_1px_0_rgba(255,255,255,0.06)_inset] transition hover:bg-[var(--theme-background-color-button-primary-hover)] md:min-w-[135px] md:px-4 md:py-3"
+        >
           From ${event.minPrice.toLocaleString()}
-        </div>
+        </button>
       </div>
-    </a>
+    </article>
   );
 }
