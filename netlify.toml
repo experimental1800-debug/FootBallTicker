@@ -4,6 +4,12 @@ publish = "dist"
 functions = "netlify/functions"
 
 [[redirects]]
+from = "/:splat/"
+to = "/:splat"
+status = 301
+force = true
+
+[[redirects]]
 from = "/api/world-cup-events"
 to = "/.netlify/functions/world-cup-events"
 status = 200
