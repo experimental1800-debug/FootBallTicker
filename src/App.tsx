@@ -11,6 +11,7 @@ import CityHero from "./components/CityHero";
 import TeamHero from "./components/TeamHero";
 import VenueInfoCard from "./components/VenueInfoCard";
 import CryptoPaymentDrawer from "./components/CryptoPaymentDrawer";
+import AuthDialog, { type AccountProfile } from "./components/AuthDialog";
 import Footer from "./components/Footer";
 import { buildFilterOptions, fallbackEvents, type Event } from "./data/events";
 import { eventMatchesHostCity, getHostCityByPath } from "./data/hostCities";
@@ -27,12 +28,67 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [dataMessage, setDataMessage] = useState<string | null>(null);
   const [selectedCheckoutEvent, setSelectedCheckoutEvent] = useState<Event | null>(null);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [registeredAccounts, setRegisteredAccounts] = useState<AccountProfile[]>([]);
+  const [signedInAccount, setSignedInAccount] = useState<AccountProfile | null>(null);
 
-  const navigateTo = useCallback((nextPath: string) => {
-    window.history.pushState({}, "", nextPath);
-    setPathname(nextPath);
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  useEffect(() => {
+    try {
+      const storedAccounts = window.localStorage.getItem("seatgeekcrypto.accounts");
+      const storedSignedInAccount = window.localStorage.getItem("seatgeekcrypto.currentAccount");
+
+      if (storedAccounts) {
+        setRegisteredAccounts(JSON.parse(storedAccounts) as AccountProfile[]);
+      }
+
+      if (storedSignedInAccount) {
+        setSignedInAccount(JSON.parse(storedSignedInAccount) as AccountProfile);
+      }
+    } catch {
+      setRegisteredAccounts([]);
+      setSignedInAccount(null);
+    }
   }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("seatgeekcrypto.accounts", JSON.stringify(registeredAccounts));
+  }, [registeredAccounts]);
+
+  useEffect(() => {
+    if (signedInAccount) {
+      window.localStorage.setItem("seatgeekcrypto.currentAccount", JSON.stringify(signedInAccount));
+      return;
+    }
+
+    window.localStorage.removeItem("seatgeekcrypto.currentAccount");
+  }, [signedInAccount]);
+
+  const navigateTo = useCallback(
+    (nextPath: string) => {
+      const [rawPathname, hashFragment] = nextPath.split("#");
+      const resolvedPathname = rawPathname || "/";
+      const destination = hashFragment ? `${resolvedPathname}#${hashFragment}` : resolvedPathname;
+
+      window.history.pushState({}, "", destination);
+      setPathname(resolvedPathname);
+
+      if (hashFragment && resolvedPathname === "/" && pathname === "/") {
+        requestAnimationFrame(() => {
+          const targetElement = document.getElementById(hashFragment);
+          if (targetElement) {
+            targetElement.scrollIntoView({ behavior: "auto", block: "start" });
+            return;
+          }
+
+          window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+        });
+        return;
+      }
+
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    },
+    [pathname]
+  );
 
   const openCheckoutDrawer = useCallback((event: Event) => {
     setSelectedCheckoutEvent(event);
@@ -40,6 +96,28 @@ export default function App() {
 
   const closeCheckoutDrawer = useCallback(() => {
     setSelectedCheckoutEvent(null);
+  }, []);
+
+  const openAuthDialog = useCallback(() => {
+    setIsAuthDialogOpen(true);
+  }, []);
+
+  const closeAuthDialog = useCallback(() => {
+    setIsAuthDialogOpen(false);
+  }, []);
+
+  const handleSignIn = useCallback((account: AccountProfile) => {
+    setSignedInAccount(account);
+    setIsAuthDialogOpen(false);
+  }, []);
+
+  const handleRegister = useCallback((account: AccountProfile) => {
+    setRegisteredAccounts((current) => {
+      const nextAccounts = current.filter((entry) => entry.email.toLowerCase() !== account.email.toLowerCase());
+      return [...nextAccounts, account];
+    });
+    setSignedInAccount(account);
+    setIsAuthDialogOpen(false);
   }, []);
 
   useEffect(() => {
@@ -203,7 +281,7 @@ export default function App() {
   if (currentTeam) {
     return (
       <div className="min-h-screen bg-[var(--theme-background-color-secondary)]">
-        <Navbar onNavigateHome={() => navigateTo("/")} />
+        <Navbar onNavigate={navigateTo} onOpenAuth={openAuthDialog} signedInAccount={signedInAccount} />
         <TeamHero team={currentTeam} />
 
         <div className="mx-auto max-w-7xl px-5 py-8 md:px-12 md:py-10 lg:px-16 xl:px-20">
@@ -240,7 +318,7 @@ export default function App() {
               <div className="mt-10">
                 <WorldCupStages onNavigate={navigateTo} embedded />
               </div>
-              <div className="mt-10">
+              <div id="world-cup-cities" className="mt-10 scroll-mt-28">
                 <HostCitiesList variant="grid" onNavigate={navigateTo} />
               </div>
               <WorldCupScheduleInfo onNavigate={navigateTo} />
@@ -254,6 +332,13 @@ export default function App() {
           isOpen={Boolean(selectedCheckoutEvent)}
           onClose={closeCheckoutDrawer}
         />
+        <AuthDialog
+          isOpen={isAuthDialogOpen}
+          registeredAccounts={registeredAccounts}
+          onClose={closeAuthDialog}
+          onSignIn={handleSignIn}
+          onRegister={handleRegister}
+        />
       </div>
     );
   }
@@ -261,7 +346,7 @@ export default function App() {
   if (currentCity) {
     return (
       <div className="min-h-screen bg-[var(--theme-background-color-secondary)]">
-        <Navbar onNavigateHome={() => navigateTo("/")} />
+        <Navbar onNavigate={navigateTo} onOpenAuth={openAuthDialog} signedInAccount={signedInAccount} />
         <CityHero city={currentCity} />
 
         <div className="mx-auto max-w-7xl px-7 py-8 md:px-16 md:py-10 lg:px-20 xl:px-24">
@@ -299,7 +384,7 @@ export default function App() {
               <div className="mt-10">
                 <WorldCupStages onNavigate={navigateTo} embedded />
               </div>
-              <div className="mt-10">
+              <div id="world-cup-cities" className="mt-10 scroll-mt-28">
                 <HostCitiesList variant="grid" onNavigate={navigateTo} />
               </div>
               <WorldCupScheduleInfo onNavigate={navigateTo} />
@@ -313,6 +398,13 @@ export default function App() {
           isOpen={Boolean(selectedCheckoutEvent)}
           onClose={closeCheckoutDrawer}
         />
+        <AuthDialog
+          isOpen={isAuthDialogOpen}
+          registeredAccounts={registeredAccounts}
+          onClose={closeAuthDialog}
+          onSignIn={handleSignIn}
+          onRegister={handleRegister}
+        />
       </div>
     );
   }
@@ -320,7 +412,7 @@ export default function App() {
   if (currentStage) {
     return (
       <div className="min-h-screen bg-[var(--theme-background-color-secondary)]">
-        <Navbar onNavigateHome={() => navigateTo("/")} />
+        <Navbar onNavigate={navigateTo} onOpenAuth={openAuthDialog} signedInAccount={signedInAccount} />
         <StageHero stage={currentStage} />
 
         <div className="mx-auto max-w-7xl px-5 py-8 md:px-12 md:py-10 lg:px-16 xl:px-20">
@@ -357,7 +449,7 @@ export default function App() {
               <div className="mt-10">
                 <WorldCupStages onNavigate={navigateTo} embedded />
               </div>
-              <div className="mt-10">
+              <div id="world-cup-cities" className="mt-10 scroll-mt-28">
                 <HostCitiesList variant="grid" onNavigate={navigateTo} />
               </div>
               <WorldCupScheduleInfo onNavigate={navigateTo} />
@@ -371,13 +463,20 @@ export default function App() {
           isOpen={Boolean(selectedCheckoutEvent)}
           onClose={closeCheckoutDrawer}
         />
+        <AuthDialog
+          isOpen={isAuthDialogOpen}
+          registeredAccounts={registeredAccounts}
+          onClose={closeAuthDialog}
+          onSignIn={handleSignIn}
+          onRegister={handleRegister}
+        />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-[var(--theme-background-color-secondary)]">
-      <Navbar onNavigateHome={() => navigateTo("/")} />
+      <Navbar onNavigate={navigateTo} onOpenAuth={openAuthDialog} signedInAccount={signedInAccount} />
       <Hero
         events={allEvents.length > 0 ? allEvents : fallbackEvents}
         onNavigate={navigateTo}
@@ -420,12 +519,14 @@ export default function App() {
             )}
           </section>
 
-          <div className="lg:hidden">
-            <HostCitiesSidebar onNavigate={navigateTo} />
-          </div>
+          <div id="world-cup-cities" className="scroll-mt-28">
+            <div className="lg:hidden">
+              <HostCitiesSidebar onNavigate={navigateTo} />
+            </div>
 
-          <div className="hidden w-[300px] shrink-0 lg:block">
-            <HostCitiesSidebar onNavigate={navigateTo} />
+            <div className="hidden w-[300px] shrink-0 lg:block">
+              <HostCitiesSidebar onNavigate={navigateTo} />
+            </div>
           </div>
         </div>
 
@@ -436,6 +537,13 @@ export default function App() {
         event={selectedCheckoutEvent}
         isOpen={Boolean(selectedCheckoutEvent)}
         onClose={closeCheckoutDrawer}
+      />
+      <AuthDialog
+        isOpen={isAuthDialogOpen}
+        registeredAccounts={registeredAccounts}
+        onClose={closeAuthDialog}
+        onSignIn={handleSignIn}
+        onRegister={handleRegister}
       />
     </div>
   );

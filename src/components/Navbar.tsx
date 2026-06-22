@@ -1,15 +1,40 @@
 import { useState } from "react";
-import { Search, Menu, X, ChevronDown } from "lucide-react";
+import { Search, Menu, User, X } from "lucide-react";
+import type { AccountProfile } from "./AuthDialog";
 
-const navLinks = ["Sports", "Music", "Shows", "Cities"];
+const navLinks = [
+  { label: "Sports", href: "/", external: false },
+  { label: "Music", href: "https://seatgeek.com/concert-tickets", external: true },
+  { label: "Shows", href: "https://seatgeek.com/theater-tickets", external: true },
+  { label: "Cities", href: "/#world-cup-cities", external: false },
+];
 
 export default function Navbar({
-  onNavigateHome,
+  onNavigate,
+  onOpenAuth,
+  signedInAccount,
 }: {
-  onNavigateHome?: () => void;
+  onNavigate?: (path: string) => void;
+  onOpenAuth?: () => void;
+  signedInAccount?: AccountProfile | null;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
+  const accountInitials = signedInAccount
+    ? `${signedInAccount.firstName.charAt(0)}${signedInAccount.lastName.charAt(0)}`.trim().toUpperCase() ||
+      signedInAccount.email.slice(0, 2).toUpperCase()
+    : "";
+
+  const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string, external: boolean) => {
+    setMobileOpen(false);
+
+    if (external || !onNavigate) {
+      return;
+    }
+
+    event.preventDefault();
+    onNavigate(href);
+  };
 
   return (
     <header className="absolute inset-x-0 top-0 z-50 text-white md:sticky md:border-b md:border-white/10 md:bg-[#09090b]/95 md:backdrop-blur-md">
@@ -24,10 +49,10 @@ export default function Navbar({
         <a
           href="/"
           onClick={(event) => {
-            if (!onNavigateHome) return;
-            event.preventDefault();
             setMobileOpen(false);
-            onNavigateHome();
+            if (!onNavigate) return;
+            event.preventDefault();
+            onNavigate("/");
           }}
           className="mr-2 flex-shrink-0 text-[11px] font-black leading-[0.9] tracking-tight text-white"
         >
@@ -48,16 +73,31 @@ export default function Navbar({
 
         <nav className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => (
-            <a key={link} href="#" className="text-sm text-white/80 transition-colors hover:text-white">
-              {link}
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={(event) => handleNavClick(event, link.href, link.external)}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noreferrer" : undefined}
+              className="text-sm text-white/80 transition-colors hover:text-white"
+            >
+              {link.label}
             </a>
           ))}
         </nav>
 
         <div className="ml-auto hidden items-center gap-5 md:flex">
-          <button className="flex items-center gap-1 text-sm text-white/80 transition-colors hover:text-white">
+          <button
+            aria-label="Set your language and currency"
+            title="Language and currency"
+            className="flex items-center gap-2 text-sm text-white/80 transition-colors hover:text-white"
+          >
+            <img
+              src="/us-flag.svg"
+              alt="USA flag"
+              className="h-[14px] w-[20px] rounded-[3px] border border-white/20 object-cover shadow-[0_1px_3px_rgba(0,0,0,0.25)]"
+            />
             <span>USD</span>
-            <ChevronDown size={13} />
           </button>
           <a href="#" className="text-sm text-white/80 transition-colors hover:text-white">
             Sell
@@ -65,18 +105,50 @@ export default function Navbar({
           <a href="#" className="text-sm text-white/80 transition-colors hover:text-white">
             Support
           </a>
-          <button className="rounded-xl bg-white/12 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/20">
-            Sign in
-          </button>
+          {signedInAccount ? (
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/16"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4f4f4] text-[0.78rem] font-black tracking-[0.08em] text-[#151515]">
+                {accountInitials}
+              </span>
+              <span className="hidden lg:inline-flex items-center gap-2">
+                <User size={14} />
+                Account
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onOpenAuth}
+              className="rounded-xl bg-white/12 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/20"
+            >
+              Sign in
+            </button>
+          )}
         </div>
 
         <div className="ml-auto flex items-center gap-3 md:hidden">
           <button className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black">
             <Search size={20} />
           </button>
-          <button className="rounded-xl bg-white px-5 py-3 text-base font-semibold text-black">
-            Sign in
-          </button>
+          {signedInAccount ? (
+            <button
+              type="button"
+              className="flex h-11 min-w-[50px] items-center justify-center rounded-full bg-white px-3 text-sm font-black tracking-[0.08em] text-black"
+            >
+              {accountInitials}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onOpenAuth}
+              className="rounded-xl bg-white px-5 py-3 text-base font-semibold text-black"
+            >
+              Sign in
+            </button>
+          )}
         </div>
       </div>
 
@@ -95,8 +167,15 @@ export default function Navbar({
 
           <div className="space-y-3">
             {navLinks.map((link) => (
-              <a key={link} href="#" className="block text-sm font-medium text-white/85">
-                {link}
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={(event) => handleNavClick(event, link.href, link.external)}
+                target={link.external ? "_blank" : undefined}
+                rel={link.external ? "noreferrer" : undefined}
+                className="block text-sm font-medium text-white/85"
+              >
+                {link.label}
               </a>
             ))}
           </div>
@@ -105,9 +184,28 @@ export default function Navbar({
             <button className="flex-1 rounded-full border border-white/15 py-2 text-sm font-medium text-white">
               Support
             </button>
-            <button className="flex-1 rounded-full bg-white/12 py-2 text-sm font-semibold text-white">
-              Sign in
-            </button>
+            {signedInAccount ? (
+              <button
+                type="button"
+                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-white/12 py-2 text-sm font-semibold text-white"
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[0.7rem] font-black tracking-[0.08em] text-black">
+                  {accountInitials}
+                </span>
+                Account
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  onOpenAuth?.();
+                }}
+                className="flex-1 rounded-full bg-white/12 py-2 text-sm font-semibold text-white"
+              >
+                Sign in
+              </button>
+            )}
           </div>
         </div>
       )}
